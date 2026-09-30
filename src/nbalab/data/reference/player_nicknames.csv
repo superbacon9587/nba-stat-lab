@@ -1,0 +1,65 @@
+# Curated nicknames that cannot be generated from a player's name.
+# Keyed by personId (verified against Players.csv). Aliases are normalized at build time.
+personId,alias
+2544,King James
+2544,Bron
+2544,LBJ
+201939,Chef Curry
+201142,KD
+201142,Slim Reaper
+203507,Greek Freak
+203999,Joker
+1629029,Luka Magic
+203076,AD
+203076,The Brow
+101108,CP3
+406,Shaq
+406,Diesel
+977,Black Mamba
+977,Mamba
+1495,Big Fundamental
+2548,D-Wade
+2548,Flash
+947,AI
+947,The Answer
+203954,The Process
+1626157,KAT
+1630162,Ant
+1630162,Ant-Man
+203081,Dame
+203081,Dame Time
+201935,The Beard
+201566,Russ
+201566,Brodie
+202695,The Klaw
+202331,PG13
+202331,PG
+202710,Jimmy Buckets
+708,KG
+1718,The Truth
+1503,T-Mac
+1713,Vinsanity
+1713,VC
+2546,Melo
+1641705,Wemby
+1626164,Book
+1628378,Spida
+203110,Dray
+202681,Uncle Drew
+1629027,Ice Trae
+1627783,Spicy P
+2730,Superman
+201565,D-Rose
+185,C-Webb
+1628991,Triple J
+1628991,JJJ
+893,MJ
+893,His Airness
+165,The Dream
+787,Chuck
+787,Sir Charles
+252,The Mailman
+951,Jesus Shuttlesworth
+204001,Unicorn
+204001,KP
+1628389,Bam

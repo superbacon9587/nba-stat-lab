@@ -1,0 +1,27 @@
+# Places people name instead of the team's city: arenas and cities that differ from TeamHistories.
+# Keyed by teamId. Seasons are starting years and bound when the team played there (blank = open).
+alias,teamId,first_season,last_season
+San Francisco,1610612744,2019,
+SF,1610612744,2019,
+Chase Center,1610612744,2019,
+Oakland,1610612744,1971,2018
+Oracle Arena,1610612744,1971,2018
+Brooklyn,1610612751,2012,
+Barclays Center,1610612751,2012,
+Newark,1610612751,2010,2011
+Madison Square Garden,1610612752,,
+MSG,1610612752,,
+Manhattan,1610612752,,
+TD Garden,1610612738,,
+Salt Lake City,1610612762,,
+Salt Lake,1610612762,,
+SLC,1610612762,,
+Minneapolis,1610612750,,
+Indianapolis,1610612754,,
+Inglewood,1610612746,2024,
+Intuit Dome,1610612746,2024,
+Crypto.com Arena,1610612747,,
+Staples Center,1610612747,,
+South Beach,1610612748,,
+Seattle,1610612760,1967,2007
+Vancouver,1610612763,1995,2000

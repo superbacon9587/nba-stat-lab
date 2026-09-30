@@ -1,0 +1,505 @@
+{
+  "version": "v1.0.0-20260929",
+  "created": "2026-09-29",
+  "train_seasons": [
+    2012,
+    2023
+  ],
+  "selection": {
+    "train": [
+      2012,
+      2022
+    ],
+    "validation": 2023
+  },
+  "test_seasons": [
+    2024,
+    2025
+  ],
+  "player_features": [
+    "points_rate_ewm5",
+    "points_rate_ewm20",
+    "assists_rate_ewm5",
+    "assists_rate_ewm20",
+    "reboundsTotal_rate_ewm5",
+    "reboundsTotal_rate_ewm20",
+    "threePointersMade_rate_ewm5",
+    "threePointersMade_rate_ewm20",
+    "steals_rate_ewm5",
+    "steals_rate_ewm20",
+    "blocks_rate_ewm5",
+    "blocks_rate_ewm20",
+    "turnovers_rate_ewm5",
+    "turnovers_rate_ewm20",
+    "fieldGoalsAttempted_rate_ewm5",
+    "fieldGoalsAttempted_rate_ewm20",
+    "threePointersAttempted_rate_ewm5",
+    "threePointersAttempted_rate_ewm20",
+    "freeThrowsAttempted_rate_ewm5",
+    "freeThrowsAttempted_rate_ewm20",
+    "points_rate_std",
+    "assists_rate_std",
+    "reboundsTotal_rate_std",
+    "threePointersMade_rate_std",
+    "steals_rate_std",
+    "blocks_rate_std",
+    "turnovers_rate_std",
+    "points_opp_pos",
+    "assists_opp_pos",
+    "reboundsTotal_opp_pos",
+    "threePointersMade_opp_pos",
+    "steals_opp_pos",
+    "blocks_opp_pos",
+    "turnovers_opp_pos",
+    "minutes_ewm5",
+    "minutes_ewm20",
+    "minutes_last5",
+    "minutes_last10",
+    "minutes_last20",
+    "minutes_trend",
+    "minutes_std",
+    "starter_share10",
+    "games_std",
+    "player_days_since_last_game",
+    "days_into_season",
+    "team_rest_days",
+    "team_is_back_to_back",
+    "is_playoff",
+    "age",
+    "team_net_rel",
+    "opp_net_rel",
+    "home",
+    "heightInches",
+    "bodyWeightLbs",
+    "pos_code",
+    "opp_drtg_rel",
+    "opp_ortg_rel",
+    "opp_pace_rel",
+    "team_ortg_rel",
+    "team_drtg_rel",
+    "team_pace_rel",
+    "opp_rest_days",
+    "opp_is_back_to_back",
+    "opp_starter_height",
+    "opp_starter_weight"
+  ],
+  "team_features": [
+    "teamScore_ewm5",
+    "teamScore_ewm20",
+    "assists_ewm5",
+    "assists_ewm20",
+    "reboundsTotal_ewm5",
+    "reboundsTotal_ewm20",
+    "threePointersMade_ewm5",
+    "threePointersMade_ewm20",
+    "fieldGoalsAttempted_ewm5",
+    "fieldGoalsAttempted_ewm20",
+    "threePointersAttempted_ewm5",
+    "threePointersAttempted_ewm20",
+    "possessions_ewm5",
+    "possessions_ewm20",
+    "opp_allowed_teamScore_ewm5",
+    "opp_allowed_teamScore_ewm20",
+    "opp_allowed_assists_ewm5",
+    "opp_allowed_assists_ewm20",
+    "opp_allowed_reboundsTotal_ewm5",
+    "opp_allowed_reboundsTotal_ewm20",
+    "opp_allowed_threePointersMade_ewm5",
+    "opp_allowed_threePointersMade_ewm20",
+    "opp_allowed_fieldGoalsAttempted_ewm5",
+    "opp_allowed_fieldGoalsAttempted_ewm20",
+    "opp_allowed_threePointersAttempted_ewm5",
+    "opp_allowed_threePointersAttempted_ewm20",
+    "opp_allowed_possessions_ewm5",
+    "opp_allowed_possessions_ewm20",
+    "teamScore_std",
+    "assists_std",
+    "reboundsTotal_std",
+    "threePointersMade_std",
+    "home",
+    "is_playoff",
+    "team_rest_days",
+    "team_is_back_to_back",
+    "opp_rest_days",
+    "opp_is_back_to_back",
+    "days_into_season",
+    "opp_drtg_rel",
+    "opp_ortg_rel",
+    "opp_pace_rel",
+    "team_ortg_rel",
+    "team_drtg_rel",
+    "team_pace_rel"
+  ],
+  "chosen": {
+    "player": {
+      "points": "lgbm",
+      "assists": "lgbm",
+      "reboundsTotal": "lgbm",
+      "threePointersMade": "lgbm",
+      "steals": "lgbm",
+      "blocks": "lgbm",
+      "turnovers": "lgbm"
+    },
+    "team": {
+      "teamScore": "glm",
+      "assists": "glm",
+      "reboundsTotal": "glm",
+      "threePointersMade": "lgbm"
+    }
+  },
+  "minutes": {
+    "validation_mae": 4.856081792030623,
+    "validation_mae_last10": 5.205834951134689,
+    "rounds": 505
+  },
+  "player": {
+    "points": {
+      "validation": {
+        "glm": {
+          "log_score": -3.048427536052828,
+          "mae": 4.500146641076437,
+          "alpha": 0.12948554892874284
+        },
+        "lgbm": {
+          "log_score": -3.0229265517488995,
+          "mae": 4.469544200776131,
+          "alpha": 0.12287595444149978
+        },
+        "quantile": {
+          "log_score": -3.054911148941044,
+          "mae": 4.557717626983593,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 482,
+      "baseline_halflife": 5,
+      "baseline_validation_log_score": {
+        "5": -3.0804868575091127,
+        "10": -3.082519676492997,
+        "20": -3.0953290744212487
+      }
+    },
+    "assists": {
+      "validation": {
+        "glm": {
+          "log_score": -1.7439223965398554,
+          "mae": 1.3210876250897792,
+          "alpha": 0.024165909348424986
+        },
+        "lgbm": {
+          "log_score": -1.7307683681969208,
+          "mae": 1.3150834791002588,
+          "alpha": 0.021557776915456163
+        },
+        "quantile": {
+          "log_score": -1.7906583342724178,
+          "mae": 1.3498156361359204,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 274,
+      "baseline_halflife": 10,
+      "baseline_validation_log_score": {
+        "5": -1.769326719894397,
+        "10": -1.766308793808641,
+        "20": -1.7736768191698171
+      }
+    },
+    "reboundsTotal": {
+      "validation": {
+        "glm": {
+          "log_score": -2.1459734122006617,
+          "mae": 1.8590698528921432,
+          "alpha": 0.014604582207292582
+        },
+        "lgbm": {
+          "log_score": -2.1327840871825448,
+          "mae": 1.8487676575579453,
+          "alpha": 0.012085602635466304
+        },
+        "quantile": {
+          "log_score": -2.1968160097945213,
+          "mae": 1.8872817990664927,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 536,
+      "baseline_halflife": 10,
+      "baseline_validation_log_score": {
+        "5": -2.1776874419446672,
+        "10": -2.176801983550237,
+        "20": -2.1851061359274304
+      }
+    },
+    "threePointersMade": {
+      "validation": {
+        "glm": {
+          "log_score": -1.2692203836655866,
+          "mae": 0.8569398297240288,
+          "alpha": 0.02309653456784737
+        },
+        "lgbm": {
+          "log_score": -1.259936817629102,
+          "mae": 0.853610487975583,
+          "alpha": 0.01619248011542865
+        },
+        "quantile": {
+          "log_score": -1.3089062431393241,
+          "mae": 0.9009899562663607,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 405,
+      "baseline_halflife": 10,
+      "baseline_validation_log_score": {
+        "5": -1.2901282093800825,
+        "10": -1.2845983808810073,
+        "20": -1.2870507073515194
+      }
+    },
+    "steals": {
+      "validation": {
+        "glm": {
+          "log_score": -1.0725063885287853,
+          "mae": 0.672161222760064,
+          "alpha": 0.037046344534825686
+        },
+        "lgbm": {
+          "log_score": -1.0656950651854429,
+          "mae": 0.6730341124567635,
+          "alpha": 0.027472669314741308
+        },
+        "quantile": {
+          "log_score": -1.1173591008412092,
+          "mae": 0.7302272404961875,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 573,
+      "baseline_halflife": 20,
+      "baseline_validation_log_score": {
+        "5": -1.1010084989509032,
+        "10": -1.0890740247077038,
+        "20": -1.0851612403881374
+      }
+    },
+    "blocks": {
+      "validation": {
+        "glm": {
+          "log_score": -0.8342711804700023,
+          "mae": 0.5295473692078035,
+          "alpha": 0.1142684335011745
+        },
+        "lgbm": {
+          "log_score": -0.8282838460168671,
+          "mae": 0.5322207390160578,
+          "alpha": 0.10498045713971402
+        },
+        "quantile": {
+          "log_score": -0.8735766806412631,
+          "mae": 0.5887978844922653,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 286,
+      "baseline_halflife": 20,
+      "baseline_validation_log_score": {
+        "5": -0.8521212606128613,
+        "10": -0.8426357698092075,
+        "20": -0.8398485786718155
+      }
+    },
+    "turnovers": {
+      "validation": {
+        "glm": {
+          "log_score": -1.3291474584359124,
+          "mae": 0.8663097593092667,
+          "alpha": 0.0
+        },
+        "lgbm": {
+          "log_score": -1.316985831839895,
+          "mae": 0.8653024892318784,
+          "alpha": 0.0
+        },
+        "quantile": {
+          "log_score": -1.367011765223874,
+          "mae": 0.9024863992980644,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 385,
+      "baseline_halflife": 20,
+      "baseline_validation_log_score": {
+        "5": -1.3560307529061832,
+        "10": -1.3466782336611407,
+        "20": -1.3466655970852903
+      }
+    }
+  },
+  "team": {
+    "teamScore": {
+      "validation": {
+        "glm": {
+          "log_score": -3.8778382837202696,
+          "mae": 9.380573383580733,
+          "alpha": 0.0017966574409343818
+        },
+        "lgbm": {
+          "log_score": -3.8809830664700047,
+          "mae": 9.440628642715076,
+          "alpha": 0.001874641563811983
+        },
+        "quantile": {
+          "log_score": -4.0092142495125715,
+          "mae": 9.442115342012086,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "glm",
+      "lgbm_rounds": 176,
+      "baseline_halflife": 10,
+      "baseline_validation_log_score": {
+        "5": -3.914308453219556,
+        "10": -3.910662319645677,
+        "20": -3.9183932591361246
+      }
+    },
+    "assists": {
+      "validation": {
+        "glm": {
+          "log_score": -2.975596553944321,
+          "mae": 3.840159813739875,
+          "alpha": 0.0
+        },
+        "lgbm": {
+          "log_score": -2.9780497951190417,
+          "mae": 3.8152516795598324,
+          "alpha": 0.0
+        },
+        "quantile": {
+          "log_score": -3.059594482984752,
+          "mae": 3.8134113418419924,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "glm",
+      "lgbm_rounds": 204,
+      "baseline_halflife": 20,
+      "baseline_validation_log_score": {
+        "5": -2.9950942801867617,
+        "10": -2.9881202029621656,
+        "20": -2.9880571549919823
+      }
+    },
+    "reboundsTotal": {
+      "validation": {
+        "glm": {
+          "log_score": -3.264808064755844,
+          "mae": 5.038747721339648,
+          "alpha": 0.0
+        },
+        "lgbm": {
+          "log_score": -3.2722518940021303,
+          "mae": 5.080303122823825,
+          "alpha": 0.0
+        },
+        "quantile": {
+          "log_score": -3.3934148699297895,
+          "mae": 5.0782203629469675,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "glm",
+      "lgbm_rounds": 199,
+      "baseline_halflife": 20,
+      "baseline_validation_log_score": {
+        "5": -3.3015041797520026,
+        "10": -3.2910232384153297,
+        "20": -3.289001145736884
+      }
+    },
+    "threePointersMade": {
+      "validation": {
+        "glm": {
+          "log_score": -2.7050146539756117,
+          "mae": 2.895785099881376,
+          "alpha": 0.0
+        },
+        "lgbm": {
+          "log_score": -2.6959023831537037,
+          "mae": 2.863760851255975,
+          "alpha": 0.0
+        },
+        "quantile": {
+          "log_score": -2.773961057309629,
+          "mae": 2.847592543465828,
+          "alpha": 0.0
+        }
+      },
+      "chosen": "lgbm",
+      "lgbm_rounds": 192,
+      "baseline_halflife": 20,
+      "baseline_validation_log_score": {
+        "5": -2.731564375058454,
+        "10": -2.7213373101384177,
+        "20": -2.718908224773353
+      }
+    }
+  },
+  "defender_tau2": {
+    "points": 0.00753078289401115,
+    "threePointersMade": 0.0,
+    "assists": 0.0
+  },
+  "data": {
+    "player_games": {
+      "mtime": 1790715579.336831,
+      "rows": 779311
+    },
+    "team_games": {
+      "mtime": 1790715579.534235,
+      "rows": 76042
+    },
+    "on_court": {
+      "mtime": 1790716014.314634,
+      "rows": 7253613
+    }
+  },
+  "calibration": {
+    "season": 2024,
+    "minutes_scales": [
+      1.3263462401359902,
+      1.131620412191296,
+      1.1666633366801307,
+      1.0688310083039596,
+      1.0888712067719553,
+      1.105918148182809,
+      1.0751334620599664,
+      1.1244352495518797
+    ],
+    "kinds": {
+      "player": {
+        "points": "platt",
+        "assists": "identity",
+        "reboundsTotal": "identity",
+        "threePointersMade": "identity",
+        "steals": "platt",
+        "blocks": "platt",
+        "turnovers": "identity"
+      },
+      "team": {
+        "teamScore": "identity",
+        "assists": "platt",
+        "reboundsTotal": "identity",
+        "threePointersMade": "platt"
+      }
+    }
+  }
+}

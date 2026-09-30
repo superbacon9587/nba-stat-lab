@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Data: raw and processed files stay local; only the small test sample is committed
+data/raw/
+data/processed/
+data/deploy/
+data/*
+!data/sample/
+
+# Models: the shipped bundle in models/ IS committed; unchosen comparison models are not
+models_archive/
+
+# Local archives
+archive/
+archive.zip
+
+# Python / tooling
+.venv
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

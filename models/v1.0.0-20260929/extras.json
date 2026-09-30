@@ -1,0 +1,347 @@
+{
+ "player": {
+  "chosen": {
+   "points": "lgbm",
+   "assists": "lgbm",
+   "reboundsTotal": "lgbm",
+   "threePointersMade": "lgbm",
+   "steals": "lgbm",
+   "blocks": "lgbm",
+   "turnovers": "lgbm"
+  },
+  "candidates": {
+   "points": [
+    "glm",
+    "lgbm"
+   ],
+   "assists": [
+    "glm",
+    "lgbm"
+   ],
+   "reboundsTotal": [
+    "glm",
+    "lgbm"
+   ],
+   "threePointersMade": [
+    "glm",
+    "lgbm"
+   ],
+   "steals": [
+    "glm",
+    "lgbm"
+   ],
+   "blocks": [
+    "glm",
+    "lgbm"
+   ],
+   "turnovers": [
+    "glm",
+    "lgbm"
+   ]
+  },
+  "features": [
+   "points_rate_ewm5",
+   "points_rate_ewm20",
+   "assists_rate_ewm5",
+   "assists_rate_ewm20",
+   "reboundsTotal_rate_ewm5",
+   "reboundsTotal_rate_ewm20",
+   "threePointersMade_rate_ewm5",
+   "threePointersMade_rate_ewm20",
+   "steals_rate_ewm5",
+   "steals_rate_ewm20",
+   "blocks_rate_ewm5",
+   "blocks_rate_ewm20",
+   "turnovers_rate_ewm5",
+   "turnovers_rate_ewm20",
+   "fieldGoalsAttempted_rate_ewm5",
+   "fieldGoalsAttempted_rate_ewm20",
+   "threePointersAttempted_rate_ewm5",
+   "threePointersAttempted_rate_ewm20",
+   "freeThrowsAttempted_rate_ewm5",
+   "freeThrowsAttempted_rate_ewm20",
+   "points_rate_std",
+   "assists_rate_std",
+   "reboundsTotal_rate_std",
+   "threePointersMade_rate_std",
+   "steals_rate_std",
+   "blocks_rate_std",
+   "turnovers_rate_std",
+   "points_opp_pos",
+   "assists_opp_pos",
+   "reboundsTotal_opp_pos",
+   "threePointersMade_opp_pos",
+   "steals_opp_pos",
+   "blocks_opp_pos",
+   "turnovers_opp_pos",
+   "minutes_ewm5",
+   "minutes_ewm20",
+   "minutes_last5",
+   "minutes_last10",
+   "minutes_last20",
+   "minutes_trend",
+   "minutes_std",
+   "starter_share10",
+   "games_std",
+   "player_days_since_last_game",
+   "days_into_season",
+   "team_rest_days",
+   "team_is_back_to_back",
+   "is_playoff",
+   "age",
+   "team_net_rel",
+   "opp_net_rel",
+   "home",
+   "heightInches",
+   "bodyWeightLbs",
+   "pos_code",
+   "opp_drtg_rel",
+   "opp_ortg_rel",
+   "opp_pace_rel",
+   "team_ortg_rel",
+   "team_drtg_rel",
+   "team_pace_rel",
+   "opp_rest_days",
+   "opp_is_back_to_back",
+   "opp_starter_height",
+   "opp_starter_weight"
+  ],
+  "corr_stats": [
+   "points",
+   "assists",
+   "reboundsTotal",
+   "threePointersMade",
+   "steals",
+   "blocks",
+   "turnovers"
+  ],
+  "league_corr": [
+   [
+    1.0,
+    -0.005710432005862792,
+    0.0848819302421842,
+    0.4976724567106278,
+    0.03008849150419734,
+    0.0133450711365028,
+    -0.007999887015312322
+   ],
+   [
+    -0.005710432005862792,
+    1.0,
+    0.057102803168123294,
+    -0.005488869384450088,
+    0.03893286885961723,
+    0.004219460154512625,
+    0.011329446472846982
+   ],
+   [
+    0.08488193024218418,
+    0.057102803168123294,
+    1.0,
+    0.003967041835155095,
+    -0.014603755521826267,
+    0.022672018135489715,
+    0.049416641751701615
+   ],
+   [
+    0.4976724567106278,
+    -0.005488869384450088,
+    0.003967041835155095,
+    1.0,
+    0.002098870900728851,
+    0.013215941063430752,
+    -0.008646672112153189
+   ],
+   [
+    0.03008849150419734,
+    0.03893286885961722,
+    -0.014603755521826266,
+    0.002098870900728851,
+    1.0,
+    0.0009239147509921223,
+    0.022190304877159967
+   ],
+   [
+    0.0133450711365028,
+    0.004219460154512625,
+    0.022672018135489715,
+    0.013215941063430752,
+    0.0009239147509921222,
+    1.0,
+    0.0027942052644623033
+   ],
+   [
+    -0.007999887015312323,
+    0.011329446472846982,
+    0.049416641751701615,
+    -0.008646672112153187,
+    0.022190304877159967,
+    0.0027942052644623033,
+    1.0
+   ]
+  ],
+  "archived": {
+   "points": [
+    "quantile"
+   ],
+   "assists": [
+    "quantile"
+   ],
+   "reboundsTotal": [
+    "quantile"
+   ],
+   "threePointersMade": [
+    "quantile"
+   ],
+   "steals": [
+    "quantile"
+   ],
+   "blocks": [
+    "quantile"
+   ],
+   "turnovers": [
+    "quantile"
+   ]
+  }
+ },
+ "team": {
+  "chosen": {
+   "teamScore": "glm",
+   "assists": "glm",
+   "reboundsTotal": "glm",
+   "threePointersMade": "lgbm"
+  },
+  "candidates": {
+   "teamScore": [
+    "glm",
+    "lgbm"
+   ],
+   "assists": [
+    "glm",
+    "lgbm"
+   ],
+   "reboundsTotal": [
+    "glm",
+    "lgbm"
+   ],
+   "threePointersMade": [
+    "glm",
+    "lgbm"
+   ]
+  },
+  "features": [
+   "teamScore_ewm5",
+   "teamScore_ewm20",
+   "assists_ewm5",
+   "assists_ewm20",
+   "reboundsTotal_ewm5",
+   "reboundsTotal_ewm20",
+   "threePointersMade_ewm5",
+   "threePointersMade_ewm20",
+   "fieldGoalsAttempted_ewm5",
+   "fieldGoalsAttempted_ewm20",
+   "threePointersAttempted_ewm5",
+   "threePointersAttempted_ewm20",
+   "possessions_ewm5",
+   "possessions_ewm20",
+   "opp_allowed_teamScore_ewm5",
+   "opp_allowed_teamScore_ewm20",
+   "opp_allowed_assists_ewm5",
+   "opp_allowed_assists_ewm20",
+   "opp_allowed_reboundsTotal_ewm5",
+   "opp_allowed_reboundsTotal_ewm20",
+   "opp_allowed_threePointersMade_ewm5",
+   "opp_allowed_threePointersMade_ewm20",
+   "opp_allowed_fieldGoalsAttempted_ewm5",
+   "opp_allowed_fieldGoalsAttempted_ewm20",
+   "opp_allowed_threePointersAttempted_ewm5",
+   "opp_allowed_threePointersAttempted_ewm20",
+   "opp_allowed_possessions_ewm5",
+   "opp_allowed_possessions_ewm20",
+   "teamScore_std",
+   "assists_std",
+   "reboundsTotal_std",
+   "threePointersMade_std",
+   "home",
+   "is_playoff",
+   "team_rest_days",
+   "team_is_back_to_back",
+   "opp_rest_days",
+   "opp_is_back_to_back",
+   "days_into_season",
+   "opp_drtg_rel",
+   "opp_ortg_rel",
+   "opp_pace_rel",
+   "team_ortg_rel",
+   "team_drtg_rel",
+   "team_pace_rel"
+  ],
+  "corr_stats": [
+   "teamScore",
+   "assists",
+   "reboundsTotal",
+   "threePointersMade"
+  ],
+  "league_corr": [
+   [
+    1.0,
+    0.5988185274293762,
+    0.06242251803559749,
+    0.5325204162494956
+   ],
+   [
+    0.5988185274293762,
+    1.0,
+    -0.008103249098097912,
+    0.44273922765236207
+   ],
+   [
+    0.06242251803559749,
+    -0.008103249098097912,
+    1.0,
+    -0.046803740177548306
+   ],
+   [
+    0.5325204162494956,
+    0.44273922765236207,
+    -0.046803740177548306,
+    1.0
+   ]
+  ],
+  "archived": {
+   "teamScore": [
+    "quantile"
+   ],
+   "assists": [
+    "quantile"
+   ],
+   "reboundsTotal": [
+    "quantile"
+   ],
+   "threePointersMade": [
+    "quantile"
+   ]
+  }
+ },
+ "defender_tau2": {
+  "points": 0.00753078289401115,
+  "threePointersMade": 0.0,
+  "assists": 0.0
+ },
+ "neutral": {
+  "starter_size": {
+   "0": {
+    "opp_starter_height": 76.67460994418082,
+    "opp_starter_weight": 207.51757420405565
+   },
+   "1": {
+    "opp_starter_height": 79.47329536942411,
+    "opp_starter_weight": 226.03196256604627
+   },
+   "2": {
+    "opp_starter_height": 82.18932847252866,
+    "opp_starter_weight": 249.7821690118443
+   }
+  }
+ }
+}

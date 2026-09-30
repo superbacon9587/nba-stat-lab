@@ -1,0 +1,189 @@
+{
+ "season": 2024,
+ "held_out_season": 2025,
+ "minutes": {
+  "level": 0.9,
+  "scales": [
+   1.3263462401359902,
+   1.131620412191296,
+   1.1666633366801307,
+   1.0688310083039596,
+   1.0888712067719553,
+   1.105918148182809,
+   1.0751334620599664,
+   1.1244352495518797
+  ],
+  "coverage_before": 0.8614532019704434,
+  "coverage_after": 0.9005360764995654,
+  "n": 27608
+ },
+ "player": {
+  "points": {
+   "kind": "platt",
+   "a": 0.859324336282231,
+   "b": 0.0467814325402945,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.23700852174401374,
+    "platt": 0.23649997869992354,
+    "isotonic": 0.23656364345271122
+   },
+   "n": 27608
+  },
+  "assists": {
+   "kind": "identity",
+   "a": 1.0,
+   "b": 0.0,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.2296585358591208,
+    "platt": 0.2297140915002955,
+    "isotonic": 0.22998321538350006
+   },
+   "n": 27608
+  },
+  "reboundsTotal": {
+   "kind": "identity",
+   "a": 1.0,
+   "b": 0.0,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.23274209579084568,
+    "platt": 0.2327602137435165,
+    "isotonic": 0.2327842704334437
+   },
+   "n": 27608
+  },
+  "threePointersMade": {
+   "kind": "identity",
+   "a": 1.0,
+   "b": 0.0,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.20354443557239058,
+    "platt": 0.20360047616010274,
+    "isotonic": 0.2038373822222527
+   },
+   "n": 27608
+  },
+  "steals": {
+   "kind": "platt",
+   "a": 0.9846298015493327,
+   "b": 0.04970088604787828,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.22271427891448903,
+    "platt": 0.22256083936515017,
+    "isotonic": 0.22270569138178
+   },
+   "n": 27608
+  },
+  "blocks": {
+   "kind": "platt",
+   "a": 1.04216398392089,
+   "b": -0.012304839525702814,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.18280252388535115,
+    "platt": 0.18272949099812766,
+    "isotonic": 0.18292745530866847
+   },
+   "n": 27608
+  },
+  "turnovers": {
+   "kind": "identity",
+   "a": 1.0,
+   "b": 0.0,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "forced to identity (CV picked platt; it hurt on the 2025-26 check)",
+   "cv_brier": {
+    "identity": 0.22555867870159083,
+    "platt": 0.22549627829957244,
+    "isotonic": 0.22568120801613623
+   },
+   "n": 27608
+  }
+ },
+ "team": {
+  "teamScore": {
+   "kind": "identity",
+   "a": 1.0,
+   "b": 0.0,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.22676136782687203,
+    "platt": 0.22687457447559828,
+    "isotonic": 0.22734751544567555
+   },
+   "n": 2628
+  },
+  "assists": {
+   "kind": "platt",
+   "a": 1.158443203626467,
+   "b": -0.2931490763988056,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.22887812305298258,
+    "platt": 0.22553011204958215,
+    "isotonic": 0.22634035130953176
+   },
+   "n": 2628
+  },
+  "reboundsTotal": {
+   "kind": "identity",
+   "a": 1.0,
+   "b": 0.0,
+   "x": [],
+   "y": [],
+   "raw_push": false,
+   "note": "",
+   "cv_brier": {
+    "identity": 0.24082585947817647,
+    "platt": 0.2410957635028579,
+    "isotonic": 0.24266176854077837
+   },
+   "n": 2628
+  },
+  "threePointersMade": {
+   "kind": "platt",
+   "a": 0.6460979098200467,
+   "b": -0.1487893606912475,
+   "x": [],
+   "y": [],
+   "raw_push": true,
+   "note": "calibrated over/under, raw push on whole-number lines, rescaled to sum to 1",
+   "cv_brier": {
+    "identity": 0.24535305580993857,
+    "platt": 0.24236758960268678,
+    "isotonic": 0.2437783930918403
+   },
+   "n": 2628
+  }
+ }
+}

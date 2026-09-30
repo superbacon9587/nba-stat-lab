@@ -1,0 +1,21 @@
+# Streamlit settings used locally and on Streamlit Community Cloud.
+# Do not set server.port: Community Cloud and HF Spaces both assign it.
+
+[theme]
+base = "dark"
+primaryColor = "#F58426"            # basketball orange: buttons, sliders, focus
+backgroundColor = "#0d0d0d"
+secondaryBackgroundColor = "#1a1a19"         # matches the plotly chart surface (nbalab.viz.theme)
+textColor = "#E8EAED"
+font = "sans serif"
+
+[client]
+toolbarMode = "viewer"              # hide developer menu items from visitors
+showErrorDetails = false            # no stack traces on the public site
+
+[browser]
+gatherUsageStats = false
+
+[server]
+runOnSave = false
+maxUploadSize = 5

@@ -1,0 +1,131 @@
+{
+ "player Points": {
+  "model": "lgbm",
+  "MAE model": 4.525,
+  "MAE baseline": 4.637,
+  "Brier model": 0.2354,
+  "Brier baseline": 0.2433,
+  "95% PI coverage": 0.957,
+  "calibration": "platt",
+  "Brier raw 2025-26": 0.2338,
+  "Brier calibrated 2025-26": 0.2334
+ },
+ "player Assists": {
+  "model": "lgbm",
+  "MAE model": 1.32,
+  "MAE baseline": 1.351,
+  "Brier model": 0.2295,
+  "Brier baseline": 0.2379,
+  "95% PI coverage": 0.98,
+  "calibration": "identity",
+  "Brier raw 2025-26": 0.2294,
+  "Brier calibrated 2025-26": 0.2294
+ },
+ "player Rebounds": {
+  "model": "lgbm",
+  "MAE model": 1.872,
+  "MAE baseline": 1.924,
+  "Brier model": 0.2323,
+  "Brier baseline": 0.2415,
+  "95% PI coverage": 0.977,
+  "calibration": "identity",
+  "Brier raw 2025-26": 0.232,
+  "Brier calibrated 2025-26": 0.232
+ },
+ "player Threes": {
+  "model": "lgbm",
+  "MAE model": 0.883,
+  "MAE baseline": 0.899,
+  "Brier model": 0.2037,
+  "Brier baseline": 0.2089,
+  "95% PI coverage": 0.984,
+  "calibration": "identity",
+  "Brier raw 2025-26": 0.2038,
+  "Brier calibrated 2025-26": 0.2038
+ },
+ "player Steals": {
+  "model": "lgbm",
+  "MAE model": 0.713,
+  "MAE baseline": 0.719,
+  "Brier model": 0.2225,
+  "Brier baseline": 0.2269,
+  "95% PI coverage": 0.986,
+  "calibration": "platt",
+  "Brier raw 2025-26": 0.2223,
+  "Brier calibrated 2025-26": 0.2223
+ },
+ "player Blocks": {
+  "model": "lgbm",
+  "MAE model": 0.518,
+  "MAE baseline": 0.516,
+  "Brier model": 0.1819,
+  "Brier baseline": 0.1842,
+  "95% PI coverage": 0.989,
+  "calibration": "platt",
+  "Brier raw 2025-26": 0.1809,
+  "Brier calibrated 2025-26": 0.1809
+ },
+ "player Turnovers": {
+  "model": "lgbm",
+  "MAE model": 0.881,
+  "MAE baseline": 0.898,
+  "Brier model": 0.2259,
+  "Brier baseline": 0.2345,
+  "95% PI coverage": 0.988,
+  "calibration": "identity",
+  "Brier raw 2025-26": 0.2263,
+  "Brier calibrated 2025-26": 0.2263
+ },
+ "team Team points": {
+  "model": "glm",
+  "MAE model": 9.414,
+  "MAE baseline": 9.843,
+  "Brier model": 0.2248,
+  "Brier baseline": 0.2379,
+  "95% PI coverage": 0.955,
+  "calibration": "identity",
+  "Brier raw 2025-26": 0.2228,
+  "Brier calibrated 2025-26": 0.2228
+ },
+ "team Assists": {
+  "model": "glm",
+  "MAE model": 3.844,
+  "MAE baseline": 3.968,
+  "Brier model": 0.2298,
+  "Brier baseline": 0.2393,
+  "95% PI coverage": 0.973,
+  "calibration": "platt",
+  "Brier raw 2025-26": 0.2308,
+  "Brier calibrated 2025-26": 0.2272
+ },
+ "team Rebounds": {
+  "model": "glm",
+  "MAE model": 5.087,
+  "MAE baseline": 5.258,
+  "Brier model": 0.2365,
+  "Brier baseline": 0.2456,
+  "95% PI coverage": 0.963,
+  "calibration": "identity",
+  "Brier raw 2025-26": 0.2321,
+  "Brier calibrated 2025-26": 0.2321
+ },
+ "team Threes": {
+  "model": "lgbm",
+  "MAE model": 2.979,
+  "MAE baseline": 2.991,
+  "Brier model": 0.2432,
+  "Brier baseline": 0.245,
+  "95% PI coverage": 0.959,
+  "calibration": "platt",
+  "Brier raw 2025-26": 0.2411,
+  "Brier calibrated 2025-26": 0.2388
+ },
+ "minutes MAE": {
+  "model": 4.84,
+  "last-10 average": 5.24
+ },
+ "minutes 90% coverage": {
+  "2024-25": 0.901,
+  "2025-26": 0.908
+ }
+}
