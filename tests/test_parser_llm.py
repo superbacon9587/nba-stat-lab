@@ -82,13 +82,28 @@ def test_request_gives_schema_stats_and_date() -> None:
     [kw] = client.calls
     assert kw["model"] == LLMSettings().model
     [tool] = kw["tools"]
-    assert tool["name"] == TOOL_NAME and tool["strict"] is True
-    assert kw["tool_choice"] == {"type": "auto"}  # forced tool_choice is rejected by current models
+    assert tool["name"] == TOOL_NAME and tool["strict"] is False  # schema too large for strict mode
+    assert kw["model"] == "claude-haiku-4-5"
+    assert kw["tool_choice"] == {"type": "tool", "name": TOOL_NAME}  # Haiku 4.5 accepts a forced tool call
+    assert kw["system"][0]["cache_control"] == {"type": "ephemeral"}  # stable prefix is cached
     system = kw["system"][0]["text"]
     assert all(s in system for s in PLAYER_STATS) and all(v in system for v in GROUPABLE_VARIABLES)
+    assert "2026-09-29" not in system  # the date lives after the cache breakpoint
     assert "2026-09-29" in kw["messages"][0]["content"]
     assert EXAMPLE_5 in kw["messages"][0]["content"]
-    assert kw["betas"] == [FALLBACK_BETA] and kw["fallbacks"] == "default"
+    assert "output_config" not in kw  # effort is not supported on Haiku 4.5
+    assert "fallbacks" not in kw and "betas" not in kw  # server-side fallbacks are for newer models
+
+
+def test_request_shape_follows_the_model() -> None:
+    from dataclasses import replace
+
+    from nbalab.nlp.llm import request_kwargs
+
+    opus = request_kwargs("q", TODAY, replace(LLMSettings(), model="claude-opus-5-5"))
+    assert opus["tool_choice"] == {"type": "auto"}  # forced tool_choice is rejected there
+    assert opus["output_config"] == {"effort": "low"}
+    assert opus["betas"] == [FALLBACK_BETA] and opus["fallbacks"] == "default"
 
 
 def test_schema_is_strict_and_matches_draft() -> None:
@@ -132,9 +147,23 @@ def test_any_llm_failure_falls_back_to_rules(outcome: Any) -> None:
 def test_strict_schema_rejection_retries_without_strict() -> None:
     client = FakeClient(api_error(400, "tools.0.input_schema: strict schema too complex"),
                         tool_response(EXAMPLE_5_DRAFT))
-    result = make_parser(client).parse(EXAMPLE_5, today=TODAY)
+    cfg = ParserConfig(llm=LLMSettings(strict=True))  # opt back in to strict: a rejection retries without it
+    result = make_parser(client, cfg).parse(EXAMPLE_5, today=TODAY)
     assert result.source == "llm"
     assert [c["tools"][0]["strict"] for c in client.calls] == [True, False]
+
+
+def test_schema_stays_within_strict_union_limit() -> None:
+    import json
+
+    from nbalab.nlp.llm import MAX_UNION_PARAMS, from_tool_input
+
+    props = draft_schema()["properties"]
+    unions = [k for k, v in props.items() if "anyOf" in json.dumps(v)]
+    assert len(unions) <= MAX_UNION_PARAMS
+    back = from_tool_input({"home_away": "any", "relative_season": "none", "back_to_back": "yes"})
+    assert back == {"home_away": None, "relative_season": None, "back_to_back": True}
+    assert QueryDraft.model_validate({**QueryDraft().model_dump(), **back}).back_to_back is True
 
 
 def test_backend_llm_raises_instead_of_falling_back() -> None:
@@ -209,3 +238,24 @@ def test_swap_entity_replaces_everywhere() -> None:
     swapped = swap_entity(swapped, 201939, 203552)  # and Seth Curry as the subject
     assert swapped.subject_ids == [203552]
     assert swapped.projection.context.opponent_team_id == 1610612755
+
+
+def test_claude_period_draft_builds_team_period_query() -> None:
+    """The bug prompt through the Claude path: a team month-group comparison, never a player query."""
+    draft = QueryDraft(subject_type="team", stats=["team_score"], period_kind="month_groups",
+                       before_months=[10, 11, 12, 1], after_months=[2, 3, 4, 5, 6])
+    client = FakeClient(tool_response({**draft.model_dump(), "home_away": "any", "relative_season": "none",
+                                       "back_to_back": "any"}))
+    q = make_parser(client).parse("compare team ppg from months 10,11,12,1 to months 2,3,4,5,6", today=TODAY).query
+    assert q.mode == "period" and q.subject_type == "team" and q.stats == ["team_score"] and q.subject_ids == []
+    assert q.period_split.before_months == [10, 11, 12, 1] and q.period_split.after_months == [2, 3, 4, 5, 6]
+
+
+def test_string_null_from_the_model_is_treated_as_missing() -> None:
+    from nbalab.nlp.llm import from_tool_input
+
+    data = {**QueryDraft(subjects=["Lakers"], stats=["threes"]).model_dump(),
+            "relative_season": "null", "venue": "None", "home_away": "home", "back_to_back": "any"}
+    draft = QueryDraft.model_validate(from_tool_input(data))
+    assert draft.relative_season is None and draft.venue is None and draft.home_away == "home"
+    assert draft.back_to_back is None and draft.subjects == ["Lakers"]

@@ -130,3 +130,24 @@ def test_format_value() -> None:
     assert format_value(27.44) == "27.4"
     assert format_value(48.123, is_ratio=True) == "48.1%"
     assert format_value(math.nan) == "–"
+
+
+# ---------------------------------------------------------------- league-wide team queries (bug)
+
+
+def test_league_team_query_keeps_team_subject_type() -> None:
+    """Regression: the form used to force subject_type="player" for league-wide queries,
+    so a team stat raised "unknown player stat 'team_score'"."""
+    q = s.StatQuery(subject_type="team", stats=["team_score"], mode="variable_effect", effect_variable="month")
+    out = roundtrip(q)
+    assert out.subject_type == "team" and out.stats == ["team_score"] and out.mode == "variable_effect"
+
+
+def test_league_subject_type_follows_the_stats() -> None:
+    from ui.formmodel import league_subject_type
+
+    assert league_subject_type(["team_score"]) == "team"
+    assert league_subject_type(["points"]) == "player"
+    assert league_subject_type(["assists"]) == "player"  # shared stat, no context: player
+    team_q = s.StatQuery(subject_type="team", stats=["assists"], mode="variable_effect", effect_variable="month")
+    assert league_subject_type(["assists"], team_q) == "team"  # shared stat keeps the query's type

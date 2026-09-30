@@ -31,6 +31,12 @@ def render(query_json: str) -> None:
     if q.mode == "variable_effect":
         render_variable_effect(q)
         return
+    if q.mode == "period":
+        from ui import periods
+
+        with st.spinner("Comparing before vs after…"):
+            periods.render(q)
+        return
     with st.spinner("Crunching the numbers…"):
         results = backend.split(query_json)
     if len(results) == 1:

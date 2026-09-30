@@ -185,6 +185,27 @@ def holm_adjust(p_values: np.ndarray) -> np.ndarray:
     return out
 
 
+def benjamini_hochberg(p_values: np.ndarray) -> np.ndarray:
+    """Benjamini-Hochberg adjusted p-values ("q-values") for many tests at once.
+
+    Test 30 teams and about 1.5 will show p < 0.05 by luck alone. BH controls
+    the *false discovery rate*: among the results called real at q < 0.10, about
+    10% are expected to be flukes. It is less strict than Holm (which guards
+    against even one fluke), which suits a scan of 30 teams. q_i = min over
+    j >= i of p_(j) x m / j, for p sorted ascending. NaN stays NaN.
+    """
+    p = np.asarray(p_values, dtype=float)
+    out = np.full(p.shape, math.nan)
+    ok = np.flatnonzero(~np.isnan(p))
+    m = ok.size
+    if m == 0:
+        return out
+    order = ok[np.argsort(p[ok])]
+    ranked = p[order] * m / np.arange(1, m + 1)
+    out[order] = np.minimum(1.0, np.minimum.accumulate(ranked[::-1])[::-1])
+    return out
+
+
 # ------------------------------------------------------------------- shrinkage
 
 

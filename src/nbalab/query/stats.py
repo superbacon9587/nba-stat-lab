@@ -56,6 +56,7 @@ class StatDef:
     denominator: Column | None = None
     per36: bool = True
     scale: float = 1.0
+    higher_is_better: bool = True  # False for turnovers, fouls, defensive rating, points allowed
 
     @property
     def is_ratio(self) -> bool:
@@ -90,8 +91,8 @@ PLAYER_STATS: dict[str, StatDef] = {
         StatDef("steals", "Steals", col("steals")),
         StatDef("blocks", "Blocks", col("blocks")),
         StatDef("stocks", "Steals + blocks", total("steals", "blocks")),
-        StatDef("turnovers", "Turnovers", col("turnovers")),
-        StatDef("fouls", "Personal fouls", col("foulsPersonal")),
+        StatDef("turnovers", "Turnovers", col("turnovers"), higher_is_better=False),
+        StatDef("fouls", "Personal fouls", col("foulsPersonal"), higher_is_better=False),
         StatDef("minutes", "Minutes", col("minutes"), per36=False),
         StatDef("fgm", "Field goals made", col("fieldGoalsMade")),
         StatDef("fga", "Field goals attempted", col("fieldGoalsAttempted")),
@@ -118,7 +119,7 @@ TEAM_STATS: dict[str, StatDef] = {
     s.name: s
     for s in [
         StatDef("team_score", "Team points", col("teamScore"), per36=False),
-        StatDef("opponent_score", "Opponent points", col("opponentScore"), per36=False),
+        StatDef("opponent_score", "Opponent points", col("opponentScore"), per36=False, higher_is_better=False),
         StatDef("total_points", "Total points (both teams)", total("teamScore", "opponentScore"), per36=False),
         StatDef("margin", "Point margin", lambda df: df["teamScore"].astype("float64") - df["opponentScore"].astype("float64"), per36=False),
         StatDef("assists", "Assists", col("assists"), per36=False),
@@ -127,12 +128,13 @@ TEAM_STATS: dict[str, StatDef] = {
         StatDef("threes_attempted", "3-pointers attempted", col("threePointersAttempted"), per36=False),
         StatDef("steals", "Steals", col("steals"), per36=False),
         StatDef("blocks", "Blocks", col("blocks"), per36=False),
-        StatDef("turnovers", "Turnovers", col("turnovers"), per36=False),
+        StatDef("turnovers", "Turnovers", col("turnovers"), per36=False, higher_is_better=False),
         StatDef("pace", "Pace", col("pace"), per36=False),
         StatDef("possessions", "Possessions", col("possessions"), per36=False),
         StatDef("off_rating", "Offensive rating", col("offensiveRating"), per36=False),
-        StatDef("def_rating", "Defensive rating", col("defensiveRating"), per36=False),
+        StatDef("def_rating", "Defensive rating", col("defensiveRating"), per36=False, higher_is_better=False),
         StatDef("net_rating", "Net rating", col("netRating"), per36=False),
+        StatDef("win_pct", "Win %", col("win"), per36=False, scale=100.0),
         StatDef("fg_pct", "FG%", col("fieldGoalsMade"), col("fieldGoalsAttempted"), False, 100.0),
         StatDef("three_pct", "3P%", col("threePointersMade"), col("threePointersAttempted"), False, 100.0),
         StatDef("ft_pct", "FT%", col("freeThrowsMade"), col("freeThrowsAttempted"), False, 100.0),
@@ -158,6 +160,8 @@ STAT_ALIASES: dict[str, str] = {
     "teamscore": "team_score", "teampoints": "team_score",
     "opponentscore": "opponent_score", "pointsallowed": "opponent_score",
     "total": "total_points", "ortg": "off_rating", "drtg": "def_rating",
+    "win%": "win_pct", "winpct": "win_pct", "winpercentage": "win_pct", "wins": "win_pct", "record": "win_pct",
+    "netrtg": "net_rating", "nrtg": "net_rating",
 }
 
 

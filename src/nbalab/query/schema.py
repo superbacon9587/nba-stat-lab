@@ -21,7 +21,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from nbalab.query.stats import GROUPABLE_VARIABLES, canonical_stat, stat_names_for
 
 SubjectType = Literal["player", "team"]
-Mode = Literal["split", "variable_effect", "projection"]
+Mode = Literal["split", "variable_effect", "projection", "period"]
 Position = Literal["G", "F", "C"]
 DayName = Literal["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -259,6 +259,59 @@ class Projection(BaseModel):
     context: ProjectionContext = Field(default_factory=ProjectionContext)
 
 
+# ------------------------------------------------------------------------ periods
+
+PeriodKind = Literal["all_star_break", "custom_date", "month_groups", "last_n_before_playoffs"]
+
+
+class PeriodSplit(BaseModel):
+    """Where to cut each season into "before" and "after" for a period comparison.
+
+    - ``all_star_break`` (default): before = regular-season games up to the break,
+      after = games after it (see :mod:`nbalab.data.calendar` for how the break is found).
+    - ``custom_date``: ``date`` as "MM-DD" (e.g. "02-20"); before = earlier games that season.
+    - ``month_groups``: ``before_months`` vs ``after_months`` (calendar month numbers).
+    - ``last_n_before_playoffs``: after = the last ``n_games`` regular-season games,
+      before = the rest of that regular season.
+
+    Regular season only by default (NBA Cup group games count as regular season);
+    ``include_playoffs`` adds playoff games to "after".
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: PeriodKind = "all_star_break"
+    date: str | None = Field(default=None, pattern=r"^(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])$")
+    before_months: list[int] = Field(default_factory=list)
+    after_months: list[int] = Field(default_factory=list)
+    n_games: int = Field(default=20, ge=1, le=82)
+    include_playoffs: bool = False
+
+    @model_validator(mode="after")
+    def _check(self) -> "PeriodSplit":
+        if self.kind == "custom_date" and not self.date:
+            raise ValueError("custom_date needs date as MM-DD")
+        if self.kind == "month_groups":
+            if not self.before_months or not self.after_months:
+                raise ValueError("month_groups needs before_months and after_months")
+            if set(self.before_months) & set(self.after_months):
+                raise ValueError("a month cannot be both before and after")
+            if any(not 1 <= m <= 12 for m in (*self.before_months, *self.after_months)):
+                raise ValueError("months are 1-12")
+        return self
+
+    def describe(self) -> str:
+        if self.kind == "all_star_break":
+            return "before vs after the All-Star break"
+        if self.kind == "custom_date":
+            return f"before vs after {self.date}"
+        if self.kind == "month_groups":
+            names = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+            return (" / ".join(names[m - 1] for m in self.before_months) + " vs "
+                    + " / ".join(names[m - 1] for m in self.after_months))
+        return f"last {self.n_games} regular-season games vs the rest"
+
+
 # --------------------------------------------------------------------------- query
 
 
@@ -284,6 +337,7 @@ class StatQuery(BaseModel):
     group_by: str | None = None
     effect_variable: str | None = None
     projection: Projection | None = None
+    period_split: PeriodSplit | None = None
     mode: Mode = "split"
 
     @model_validator(mode="before")
@@ -316,6 +370,10 @@ class StatQuery(BaseModel):
             raise ValueError(f"mode={self.mode!r} needs at least one subject id")
         if self.mode == "variable_effect" and not (self.effect_variable or self.group_by):
             raise ValueError("variable_effect mode needs effect_variable (or group_by)")
+        if self.mode == "period" and self.period_split is None:
+            object.__setattr__(self, "period_split", PeriodSplit())
+        if self.mode != "period" and self.period_split is not None:
+            raise ValueError("period_split only applies to mode='period'")
         if self.mode == "projection" and self.projection is None:
             raise ValueError("projection mode needs a projection block")
         if self.subject_type == "team":

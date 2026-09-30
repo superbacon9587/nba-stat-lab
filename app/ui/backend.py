@@ -189,6 +189,37 @@ def conflicts(query_json: str) -> list[tuple[str, list[tuple[str, str]]]]:
     return [(c.message, [(f.label, f.query.model_dump_json()) for f in c.fixes]) for c in find_conflicts(q, data())]
 
 
+# ----------------------------------------------------------------------- periods
+
+
+@st.cache_data(show_spinner=False, max_entries=64)
+def period_team_table(query_json: str, season: int | None) -> Any:
+    from nbalab.query.periods import team_table
+
+    return team_table(s.StatQuery.model_validate_json(query_json), data(), season)
+
+
+@st.cache_data(show_spinner=False, max_entries=64)
+def period_team_detail(query_json: str, team_id: int) -> Any:
+    from nbalab.query.periods import team_detail
+
+    return team_detail(s.StatQuery.model_validate_json(query_json), data(), team_id)
+
+
+@st.cache_data(show_spinner=False, max_entries=64)
+def period_player_detail(query_json: str) -> Any:
+    from nbalab.query.periods import player_detail
+
+    return player_detail(s.StatQuery.model_validate_json(query_json), data())
+
+
+@st.cache_data(show_spinner=False, max_entries=64)
+def period_leaderboard(query_json: str, min_games: int, per36: bool) -> Any:
+    from nbalab.query.periods import player_leaderboard
+
+    return player_leaderboard(s.StatQuery.model_validate_json(query_json), data(), min_games=min_games, per36=per36)
+
+
 def effect_variables() -> dict[str, Any]:
     from nbalab.query.variable_effect import VARIABLES
 

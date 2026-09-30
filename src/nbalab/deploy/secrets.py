@@ -22,6 +22,7 @@ from nbalab.data.config import PROJECT_ROOT
 KNOWN_SETTINGS: tuple[str, ...] = (
     "ANTHROPIC_API_KEY", "NBALAB_DATA_REPO", "NBALAB_DATA_REVISION", "HF_TOKEN",
     "NBALAB_LLM_PER_SESSION_PER_HOUR", "NBALAB_LLM_PER_APP_PER_HOUR", "NBALAB_SKIP_ON_COURT",
+    "NBALAB_PARSER_MODEL", "NBALAB_PARSER_EFFORT",
 )
 _PLACEHOLDERS: frozenset[str] = frozenset({"", "sk-ant-...", "changeme", "your-key-here", "hf_..."})
 

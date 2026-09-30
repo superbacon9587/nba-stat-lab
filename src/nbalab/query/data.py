@@ -64,7 +64,24 @@ class QueryData:
     teams: pd.DataFrame
     on_court: pd.DataFrame | None = None
     matchups: pd.DataFrame | None = None
+    season_calendar: pd.DataFrame | None = None
+    conferences: pd.DataFrame | None = None
     _team_names: dict[tuple[int, int], str] = field(default_factory=dict, repr=False)
+
+    def calendar(self) -> pd.DataFrame:
+        """Season calendar (All-Star break per season); rebuilt from the schedule if not loaded."""
+        if self.season_calendar is None:
+            from nbalab.data.calendar import build_season_calendar
+
+            self.season_calendar = build_season_calendar(None, self.team_games)
+        return self.season_calendar
+
+    def conference_table(self) -> pd.DataFrame:
+        if self.conferences is None:
+            from nbalab.data.calendar import infer_conferences
+
+            self.conferences = infer_conferences(self.team_games)
+        return self.conferences
 
     @property
     def latest_season(self) -> int:
@@ -163,4 +180,10 @@ def load_query_data(processed_dir: Path = PROCESSED_DIR) -> QueryData:
         on_court=_read_optional(d / "on_court.parquet", normalize_on_court,
                                 _all_candidates(ON_COURT_COLUMNS, ON_COURT_OPTIONAL)),
         matchups=_read_optional(d / "matchups.parquet", normalize_matchups, _all_candidates(MATCHUP_COLUMNS)),
+        season_calendar=_read_plain(d / "season_calendar.parquet"),
+        conferences=_read_plain(d / "conferences.parquet"),
     )
+
+
+def _read_plain(path: Path) -> pd.DataFrame | None:
+    return pd.read_parquet(path) if path.exists() else None

@@ -263,6 +263,61 @@ def read_time(sc: Scanner, d: QueryDraft) -> None:
         d.relative_season = "last"
 
 
+MONTH_ABBR = {m[:3]: i + 1 for i, m in enumerate(MONTHS)}
+_MONTH_WORD = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?"
+_MONTH_LIST = rf"((?:(?:\d{{1,2}}|{_MONTH_WORD})\s*(?:,|and|&|-|to|through)?\s*)+)"
+MONTH_GROUPS_RE = re.compile(
+    rf"\bmonths?\s+{_MONTH_LIST}\s*(?:to|vs\.?|versus|against|compared (?:to|with)|and)\s+(?:months?\s+)?{_MONTH_LIST}",
+    re.I)
+LAST_N_BEFORE_PLAYOFFS_RE = re.compile(
+    rf"\b(?:last|final)\s+{NUM}\s+(?:regular[\s-]season\s+)?games?\s+(?:before|heading into|going into|leading up to)"
+    r"\s+(?:the\s+)?(?:playoffs?|postseason)\b", re.I)
+RUN_UP_RE = re.compile(r"\b(?:leading (?:up )?(?:in)?to|heading into|going into|run[\s-]up to)\s+(?:the\s+)?"
+                       r"(?:playoffs?|postseason)\b|\b(?:down the stretch|stretch run)\b", re.I)
+ALL_STAR_RE = re.compile(
+    r"\b(?:(?:before\s+(?:vs\.?|versus|and)\s+after|after|before|since|post|pre)[\s-]+(?:the\s+)?)?"
+    r"(?:all[\s-]?star\s+(?:break|game|weekend)|the\s+break)\b|\bpost[\s-]?(?:all[\s-]?star|break)\b|"
+    r"\bsecond half of the season\b", re.I)
+CUSTOM_DATE_RE = re.compile(rf"\b(?:before|after|since)\s+({_MONTH_WORD})\s+(\d{{1,2}})(?:st|nd|rd|th)?\b(?!\d)", re.I)
+LEADERBOARD_RE = re.compile(r"\b(?:who|which players?)\b.{0,40}?\b(?:improves?|gets? better|improved|rises?|"
+                            r"declines?|drops? off|gets? worse|changes?)\b.{0,15}?\b(?:most|the most)\b"
+                            r"|\bwhich players?\b|\bplayers? (?:who|that)\b|\b(?:rank|ranking of) (?:all )?players\b", re.I)
+TEAMS_WORD_RE = re.compile(r"\b(?:teams|every team|all teams|team (?:ppg|points|scoring|pace|ratings?))\b", re.I)
+
+
+def _month_numbers(text: str) -> list[int]:
+    """"10,11,12,1" or "Oct-Jan" -> month numbers (ranges wrap across the new year)."""
+    parts = re.findall(rf"\d{{1,2}}|{_MONTH_WORD}", text, re.I)
+    nums = [int(p) if p.isdigit() else MONTH_ABBR[p[:3].lower()] for p in parts]
+    if re.search(r"-|\bto\b|through", text) and len(nums) == 2:
+        a, b = nums
+        return [((a - 1 + i) % 12) + 1 for i in range((b - a) % 12 + 1)]
+    return [n for n in dict.fromkeys(nums) if 1 <= n <= 12]
+
+
+def read_period(sc: Scanner, d: QueryDraft) -> bool:
+    """Before/after comparisons. Runs before the time and calendar rules so that
+    "last 20 games before the playoffs" and "months 10,11,12,1" are not read as filters."""
+    if (m := next(sc.matches(MONTH_GROUPS_RE), None)) is not None:
+        d.period_kind = "month_groups"
+        d.before_months, d.after_months = _month_numbers(m.group(1)), _month_numbers(m.group(2))
+    elif (m := next(sc.matches(LAST_N_BEFORE_PLAYOFFS_RE), None)) is not None:
+        d.period_kind, d.period_n_games = "last_n_before_playoffs", to_int(m.group(1))
+    elif next(sc.matches(ALL_STAR_RE), None) is not None:
+        d.period_kind = "all_star_break"
+    elif next(sc.matches(RUN_UP_RE), None) is not None:
+        d.period_kind, d.period_n_games = "last_n_before_playoffs", 20
+    elif (m := next(sc.matches(CUSTOM_DATE_RE), None)) is not None:
+        d.period_kind, d.period_date = "custom_date", f"{MONTH_ABBR[m.group(1)[:3].lower()]:02d}-{int(m.group(2)):02d}"
+    if next(sc.matches(LEADERBOARD_RE), None) is not None:
+        d.leaderboard = True
+        if d.period_kind == "none":
+            d.period_kind = "all_star_break"
+    if d.period_kind != "none" and next(sc.matches(TEAMS_WORD_RE, take=False), None) is not None:
+        d.subject_type = "team"
+    return d.period_kind != "none"
+
+
 def read_grouping(sc: Scanner, effect_question: bool) -> str | None:
     """The variable in "how does X affect ..." / "by X" / "home vs away"."""
     for pattern, var in VARIABLE_PHRASES:
@@ -506,6 +561,7 @@ def parse_rules(prompt: str, index: EntityIndex) -> QueryDraft:
     effect_question = bool(EFFECT_RE.search(prompt))
 
     d.lines = read_lines(sc, projection)
+    period = read_period(sc, d)
     read_measures(sc, d)
     read_time(sc, d)
     variable = read_grouping(sc, effect_question)
@@ -521,7 +577,9 @@ def parse_rules(prompt: str, index: EntityIndex) -> QueryDraft:
     d.stats = list(dict.fromkeys([*stats, *(ln.stat for ln in d.lines)]))
     fill_names(prompt, find_mentions(sc, index), d)
 
-    if variable and (effect_question or variable not in ALWAYS_GROUP) and not d.subjects:
+    if period:
+        d.mode = "split"  # the builder turns a period_kind into mode="period"
+    elif variable and (effect_question or variable not in ALWAYS_GROUP) and not d.subjects:
         d.mode, d.effect_variable = "variable_effect", variable
     elif variable:
         d.mode, d.group_by = "split", variable

@@ -75,6 +75,14 @@ class QueryDraft(BaseModel):
     playoffs: bool | None = None
     min_minutes: float | None = None
 
+    # period comparisons ("before vs after the All-Star break"); "none" = not a period question
+    period_kind: Literal["none", "all_star_break", "custom_date", "month_groups", "last_n_before_playoffs"] = "none"
+    period_date: str = ""  # "MM-DD" for custom_date
+    before_months: list[int] = Field(default_factory=list)
+    after_months: list[int] = Field(default_factory=list)
+    period_n_games: int = 0  # for last_n_before_playoffs; 0 = default (20)
+    leaderboard: bool = False  # "who improves most": rank every player
+
     lines: list[DraftLine] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
 

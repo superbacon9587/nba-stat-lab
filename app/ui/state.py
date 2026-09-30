@@ -17,7 +17,7 @@ from nbalab.nlp.build import TEAM_DEFAULT_SEASONS
 from nbalab.query import schema as s
 from nbalab.query.stats import stat_names_for
 from ui import backend
-from ui.formmodel import FIELDS, default_form, form_to_query, query_to_form
+from ui.formmodel import FIELDS, default_form, form_to_query, league_subject_type, query_to_form
 
 PREFIXES = ("form_", "chip_")
 
@@ -78,7 +78,8 @@ def on_change(prefix: str, field: str) -> None:
 
 def apply_form(f: dict[str, Any]) -> None:
     lo, hi = backend.season_bounds()
-    if f["subject_id"] is None and f["subject_type"] != "league":
+    period = query() is not None and query().mode == "period"
+    if f["subject_id"] is None and f["subject_type"] != "league" and not period:
         _hold(f)  # nothing to query until a player or team is picked
         return
     try:
@@ -104,7 +105,10 @@ def retarget_subject_type(f: dict[str, Any]) -> dict[str, Any]:
     """Switching player <-> team <-> league: clear the subject, keep stats that still exist."""
     f = dict(f)
     f["subject_id"] = None
-    kind = "team" if f["subject_type"] == "team" else "player"
+    if f["subject_type"] == "league":  # keep team stats as a league-wide *team* question
+        kind = league_subject_type(f["stats"], query())
+    else:
+        kind = "team" if f["subject_type"] == "team" else "player"
     valid = stat_names_for(kind)
     mapped = [("team_score" if (kind == "team" and x == "points") else
                "points" if (kind == "player" and x == "team_score") else x) for x in f["stats"]]
@@ -116,6 +120,14 @@ def retarget_subject_type(f: dict[str, Any]) -> dict[str, Any]:
     if kind == "team" and f["subject_type"] == "team" and tuple(f["season_range"]) == (lo, hi):
         f["season_range"] = (max(hi - TEAM_DEFAULT_SEASONS + 1, lo), hi)  # same default as the parser
     return f
+
+
+def set_period_split(split: s.PeriodSplit) -> None:
+    """Split-point editor callback for period comparisons."""
+    q = query()
+    if q is not None:
+        set_query(q.model_copy(update={"period_split": split}))
+        st.session_state["ran"] = None
 
 
 def apply_fix(query_json: str) -> None:

@@ -216,3 +216,41 @@ def test_team_questions_default_to_last_three_seasons(parser: PromptParser) -> N
     assert any("last 3 seasons" in a.message for a in res.assumptions)
     explicit = parser.parse("Celtics points per game since 2015", backend="rules", today=TODAY).query
     assert explicit.filters[0].start == 2015
+
+
+# ---------------------------------------------------------------- period comparisons
+
+
+@pytest.mark.parametrize("prompt, kind, subject_type, subjects, stats, split", [
+    ("before vs after the all star break", "team", "team", [], ["team_score"], {}),
+    ("Celtics after the all star break", "team", "team", [BOS], ["team_score"], {}),
+    ("how do teams change after the all star break", "team", "team", [], ["team_score"], {}),
+    ("Tatum's scoring leading up to the playoffs", "player", "player", [TATUM], ["points"],
+     {"kind": "last_n_before_playoffs"}),
+    ("compare team ppg from months 10,11,12,1 to months 2,3,4,5,6", "team", "team", [], ["team_score"],
+     {"kind": "month_groups", "before_months": [10, 11, 12, 1], "after_months": [2, 3, 4, 5, 6]}),
+    ("who improves most after the break", "player", "player", [], ["points"], {}),
+    ("Lakers net rating last 20 games before playoffs", "team", "team", [LAL], ["net_rating"],
+     {"kind": "last_n_before_playoffs"}),
+    ("Curry points after Feb 20", "player", "player", [CURRY], ["points"], {"kind": "custom_date", "date": "02-20"}),
+])
+def test_period_phrasings(parser: PromptParser, prompt: str, kind: str, subject_type: str, subjects: list[int],
+                          stats: list[str], split: dict) -> None:
+    res = parser.parse(prompt, backend="rules", today=TODAY)
+    q = res.query
+    assert q is not None, [u.message for u in res.unresolved]
+    assert q.mode == "period" and q.subject_type == subject_type and q.subject_ids == subjects and q.stats == stats
+    assert q.period_split.model_dump(exclude_defaults=True) == split
+    assert all(f.type in ("season_range", "last_n_seasons") for f in q.filters)  # only the season scope applies
+
+
+def test_period_bug_prompt_is_a_valid_team_query(parser: PromptParser) -> None:
+    """The prompt from the bug report: team stat, no team named -> every team, month groups."""
+    q = parser.parse("compare team ppg from months 10,11,12,1 to months 2,3,4,5,6", backend="rules", today=TODAY).query
+    assert q.subject_type == "team" and q.stats == ["team_score"]
+    assert StatQuery.model_validate_json(q.model_dump_json()) == q
+
+
+def test_which_players_is_a_player_ranking(parser: PromptParser) -> None:
+    q = parser.parse("which players get better after the all star break in rebounds", backend="rules", today=TODAY).query
+    assert q.mode == "period" and q.subject_type == "player" and q.subject_ids == [] and q.stats == ["rebounds"]

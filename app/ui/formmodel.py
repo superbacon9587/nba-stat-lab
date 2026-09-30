@@ -15,6 +15,7 @@ from __future__ import annotations
 from typing import Any
 
 from nbalab.query import schema as s
+from nbalab.query.stats import stat_names_for
 
 HANDLED_FILTERS: frozenset[str] = frozenset({
     "opponent_team", "defender_player", "defender_height_range", "venue", "home_away",
@@ -99,7 +100,7 @@ def form_to_query(f: dict[str, Any], base: s.StatQuery | None, first_season: int
     filters, and lines for secondary stats in a combo projection.
     """
     league = f["subject_type"] == "league"
-    subject_type = "player" if league else f["subject_type"]
+    subject_type = league_subject_type(f["stats"], base) if league else f["subject_type"]
     projecting = bool(f["line_on"]) and not league
     filters: list[s.Filter] = []
     context: dict[str, Any] = {}
@@ -156,6 +157,11 @@ def form_to_query(f: dict[str, Any], base: s.StatQuery | None, first_season: int
             lines[f["stats"][0]] = float(f["line"])
         projection = s.Projection(lines=lines, context=s.ProjectionContext(**context))
 
+    if base is not None and base.mode == "period" and not league:
+        # Period comparisons keep their split point; only the season scope applies to them.
+        scope = [flt for flt in [*filters, *kept] if flt.type in s.SCOPE_FILTER_TYPES]
+        return s.StatQuery(subject_type=subject_type, subject_ids=subject_ids, stats=list(f["stats"]),
+                           filters=scope, mode="period", period_split=base.period_split)
     mode = "variable_effect" if league else ("projection" if projecting else "split")
     effect_variable = (f["effect_variable"] or f["group_by"]) if league else None
     return s.StatQuery(
@@ -163,6 +169,19 @@ def form_to_query(f: dict[str, Any], base: s.StatQuery | None, first_season: int
         filters=[*filters, *kept], group_by=f["group_by"] if not league else None,
         effect_variable=effect_variable, projection=projection, mode=mode,
     )
+
+
+def league_subject_type(stats: list[str], base: s.StatQuery | None = None) -> str:
+    """Subject type of a league-wide question, which names no player or team.
+
+    Keep the current query's type while its stats still exist for it (league-wide team
+    assists stay a team question). Otherwise the stats decide: "team" when every stat is
+    team-only (team_score, pace, net_rating, ...), else "player".
+    """
+    if base is not None and not base.subject_ids and stats and set(stats) <= stat_names_for(base.subject_type):
+        return base.subject_type
+    team_only = stat_names_for("team") - stat_names_for("player")
+    return "team" if stats and all(x in team_only for x in stats) else "player"
 
 
 def _subject_ids(f: dict[str, Any], base: s.StatQuery | None, subject_type: str, league: bool) -> list[int]:

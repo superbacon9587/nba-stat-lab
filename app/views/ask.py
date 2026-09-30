@@ -14,6 +14,7 @@ EXAMPLES: list[tuple[str, str]] = [
      "expected points and assists for this game? What are the chances he exceeds 27.5 points and 5.5 assists?"),
     ("Tatum's rebounds by weekday", "how does day of week affect Jayson Tatum's rebounds"),
     ("Back-to-backs for all guards", "how do back to backs affect scoring for all guards"),
+    ("Teams before vs after the All-Star break", "how do teams change after the all star break"),
 ]
 
 
@@ -75,17 +76,22 @@ with st.expander("Advanced / manual: set every filter by hand", icon=":material/
     form.manual_form()
 
 # --------------------------------------------------------- interpreted query
-if st.session_state.get("sq_error"):
-    st.error(st.session_state["sq_error"], icon=":material/error:")
-
 q = state.query()
 parsed = st.session_state.get("parsed")
-if q is not None or parsed is not None:
+edit_error = st.session_state.get("sq_error")
+if q is not None or parsed is not None or edit_error:
     with st.container(border=True):
         st.markdown("<div class='nbl-kicker'>Here's how I read your question · click a chip to edit it</div>",
                     unsafe_allow_html=True)
         if q is not None:
             form.chips(q)
+            if q.mode == "period":
+                from ui import periods
+
+                periods.split_editor(q, state.set_period_split, "ask_split")
+        if edit_error:  # shown on the chips it concerns, never as a crash box
+            kept = " The last valid version is kept above; change the chip again to fix it." if q is not None else ""
+            st.warning(f"**That edit can't be applied:** {edit_error}.{kept}", icon=":material/edit_off:")
         if parsed is not None:
             if st.session_state.get("parse_note") and backend.has_llm_key():  # rate-limit fallbacks only
                 st.info(st.session_state["parse_note"], icon=":material/info:")
@@ -103,9 +109,11 @@ if q is not None or parsed is not None:
             st.caption(f"Parsed by the {'Claude' if getattr(parsed, 'source', '') == 'llm' else 'rule-based'} parser.")
         if q is not None:
             conflict_box(q)
+            blocked = bool(edit_error) or bool(backend.conflicts(q.model_dump_json()))
             stale = st.session_state.get("ran") not in (None, q.model_dump_json())
             st.button("Run" if not stale else "Run with the edited filters", type="primary",
-                      icon=":material/play_arrow:", on_click=state.run)
+                      icon=":material/play_arrow:", on_click=state.run, disabled=blocked,
+                      help="Fix the issue above first." if blocked else None)
 
 # ------------------------------------------------------------------------ results
 ran = st.session_state.get("ran")

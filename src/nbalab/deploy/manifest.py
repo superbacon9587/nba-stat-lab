@@ -107,7 +107,14 @@ TABLES: dict[str, TableSpec] = {
     "matchups": TableSpec(
         columns=("gameId", "season", "offPersonId", "defPersonId", "partialPossessions"),
     ),
+    # Season timing (nbalab.data.calendar). Small; the app rebuilds the calendar from
+    # team_games (without the All-Star Game dates) if these are missing.
+    "season_calendar": TableSpec(
+        columns=("season", "break_last_before", "break_first_after", "all_star_date", "all_star_date_known",
+                 "source", "regular_season_start", "regular_season_end", "playoffs_start"),
+    ),
+    "conferences": TableSpec(columns=("season", "teamId", "conference")),
 }
 
 # Tables the app can run without (the query layer skips them when absent).
-OPTIONAL_TABLES: frozenset[str] = frozenset({"on_court", "matchups"})
+OPTIONAL_TABLES: frozenset[str] = frozenset({"on_court", "matchups", "season_calendar", "conferences"})

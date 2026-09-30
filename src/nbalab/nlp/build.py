@@ -31,7 +31,7 @@ from nbalab.nlp.measures import (
 from nbalab.nlp.seasons import current_season, last_completed_season, last_n_completed, season_label
 from nbalab.nlp.types import Assumption, QueryDraft, UnresolvedItem
 from nbalab.query.schema import StatQuery
-from nbalab.query.stats import GROUPABLE_VARIABLES, canonical_stat
+from nbalab.query.stats import GROUPABLE_VARIABLES, canonical_stat, stat_names_for
 
 FIRST_DATA_SEASON = BuildConfig().start_season
 MAX_CANDIDATES = 6
@@ -226,6 +226,15 @@ class QueryBuilder:
         seasons = self.season_span(d)
         kind, subject_ids = self.subjects(d, seasons)
         mode, group_by, effect = self.mode(d, bool(subject_ids))
+        period = self.period_split(d)
+        if period is not None:
+            mode, group_by, effect = "period", None, None
+            kind = self.period_kind(d, kind, subject_ids)
+            if kind == "player" and not subject_ids and seasons is None:
+                done = last_completed_season(self.today)
+                seasons = (done, done)
+                self.assume("seasons", f"Ranking every player uses the latest completed season "
+                            f"({season_label(done)}) by default. Widen it with the seasons chip.", [done, done])
         if kind == "team" and seasons is None and mode != "variable_effect" and not self.historical_team_named(d):
             seasons = last_n_completed(TEAM_DEFAULT_SEASONS, self.today)
             self.assume("seasons", f"No seasons given; team questions default to the last {TEAM_DEFAULT_SEASONS} "
@@ -248,19 +257,66 @@ class QueryBuilder:
         if mode == "projection":
             projection = {"lines": self.fill_lines(lines, stats, kind, subject_ids), "context": ctx}
 
-        if mode != "variable_effect" and not subject_ids:
+        if mode not in ("variable_effect", "period") and not subject_ids:
             if not any(u.field == "subject" for u in self.unresolved):
                 self.flag("not_found", "subject", "", "No player or team found in the question.")
             return None
+        if mode == "period":  # only the season scope applies; other filters would silently change the sample
+            dropped = [f["type"] for f in filters if f["type"] not in ("season_range", "last_n_seasons")]
+            if dropped:
+                self.assume("filters", "Before/after comparisons use every regular-season game in the seasons "
+                            f"asked about; ignored: {', '.join(sorted(set(dropped)))}.")
+            filters = [f for f in filters if f["type"] in ("season_range", "last_n_seasons")]
         try:
             return StatQuery(
                 subject_type=kind, subject_ids=subject_ids, stats=stats, filters=filters,
                 group_by=group_by, effect_variable=effect, projection=projection, mode=mode,
+                period_split=period,
             )
         except ValidationError as e:
             msg = "; ".join(err["msg"] for err in e.errors())
             self.flag("unsupported", "query", "", f"Could not build a valid query: {msg}")
             return None
+
+    def period_split(self, d: QueryDraft) -> dict[str, Any] | None:
+        """The PeriodSplit for a before/after question, or None."""
+        if d.period_kind == "none":
+            return None
+        split: dict[str, Any] = {"kind": d.period_kind}
+        if d.period_kind == "custom_date":
+            split["date"] = d.period_date
+        elif d.period_kind == "month_groups":
+            split["before_months"], split["after_months"] = list(d.before_months), list(d.after_months)
+            if 5 in d.after_months or 6 in d.after_months:
+                self.assume("period", "May and June are almost all playoff games; the comparison uses regular-season "
+                            "games only, so those months add little or nothing.")
+        elif d.period_kind == "last_n_before_playoffs":
+            split["n_games"] = d.period_n_games or 20
+        self.assume("period", "Compared: " + {
+            "all_star_break": "games before vs after the All-Star break, regular season only",
+            "custom_date": f"games before vs after {d.period_date} (MM-DD), regular season only",
+            "month_groups": f"months {d.before_months} vs {d.after_months}, regular season only",
+            "last_n_before_playoffs": f"the last {split.get('n_games', 20)} regular-season games vs the rest",
+        }[d.period_kind] + ".", split)
+        return split
+
+    def period_kind(self, d: QueryDraft, kind: str, subject_ids: list[int]) -> str:
+        """Subject type of a before/after question with no subject named.
+
+        "Who improves most" (``leaderboard``) or player-only stats rank every
+        player; anything else ("before vs after the All-Star break", "how do teams
+        change") compares every team.
+        """
+        if subject_ids:
+            return kind
+        player_only = stat_names_for("player") - stat_names_for("team")
+        stats = {st for st in d.stats if st in player_only or st in {"ppg", "pts"}}
+        if d.leaderboard or (d.stats and len(stats) == len(d.stats) and kind != "team"):
+            self.assume("subject", "No player named, so every player is ranked by how much they changed "
+                        "(shrunk toward the league average so small samples can't dominate).", "leaderboard")
+            return "player"
+        self.assume("subject", "No team or player named, so every team is compared.", "all_teams")
+        return "team"
 
     def subjects(self, d: QueryDraft, seasons: SeasonSpan | None) -> tuple[str, list[int]]:
         """Resolve subjects. If a "player" is really a team name (or vice versa), switch."""

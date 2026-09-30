@@ -29,6 +29,7 @@ from nbalab.data.clean import (
     season_from_game_id,
     season_label,
 )
+from nbalab.data.calendar import build_season_calendar, infer_conferences
 from nbalab.data.config import REFERENCE_DIR, BuildConfig
 from nbalab.data.features import (
     add_lagged_rolling_means,
@@ -468,17 +469,20 @@ def select_team_columns(t: pd.DataFrame, config: BuildConfig) -> pd.DataFrame:
 
 
 def build_tables(raw: RawTables, config: BuildConfig) -> dict[str, pd.DataFrame]:
-    """Pure transformation from raw tables to the four processed tables."""
+    """Pure transformation from raw tables to the processed tables (games, lookups, season calendar)."""
     game_meta = build_game_meta(raw)
     team_games = build_team_games(raw, game_meta, config)
     ps = clean_player_rows(raw, game_meta, config)
     bio = player_bio_table(raw.players, ps)
     player_games = build_player_games(ps, bio, team_games, config)
+    team_out = select_team_columns(team_games, config)
     return {
         "player_games": select_player_columns(player_games, config),
-        "team_games": select_team_columns(team_games, config),
+        "team_games": team_out,
         "players": build_players_lookup(player_games, bio),
         "teams": build_teams_lookup(raw, team_games, config),
+        "season_calendar": build_season_calendar(raw.games, team_out),
+        "conferences": infer_conferences(team_out),
     }
 
 
