@@ -259,3 +259,11 @@ def test_string_null_from_the_model_is_treated_as_missing() -> None:
     draft = QueryDraft.model_validate(from_tool_input(data))
     assert draft.relative_season is None and draft.venue is None and draft.home_away == "home"
     assert draft.back_to_back is None and draft.subjects == ["Lakers"]
+
+
+def test_parser_data_dir_follows_the_app(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    """Hosted apps download the data elsewhere; the parser must read names from that folder."""
+    monkeypatch.setenv("NBALAB_PARSER_DATA_DIR", str(tmp_path))
+    assert ParserConfig.from_env().processed_dir == tmp_path
+    monkeypatch.delenv("NBALAB_PARSER_DATA_DIR")
+    assert ParserConfig.from_env().processed_dir.name == "processed"

@@ -41,13 +41,20 @@ def _secrets_to_env() -> None:
 
 
 @st.cache_resource(show_spinner="Loading NBA data…")
-def data() -> QueryData:
-    """Processed tables from data/deploy/ (slim, hosted) or data/processed/ (local)."""
+def data_dir() -> Path | None:
+    """Folder holding the parquet files: data/deploy/ (slim, downloaded when hosted) or data/processed/."""
     try:
         from nbalab.deploy.fetch import ensure_data
     except ImportError:
-        return load_query_data()
-    return load_query_data(ensure_data())
+        return None
+    return ensure_data()
+
+
+@st.cache_resource(show_spinner="Loading NBA data…")
+def data() -> QueryData:
+    """Processed tables from data/deploy/ (slim, hosted) or data/processed/ (local)."""
+    folder = data_dir()
+    return load_query_data() if folder is None else load_query_data(folder)
 
 
 def season_bounds() -> tuple[int, int]:
@@ -103,6 +110,9 @@ def parser_module():
     """The parser module, or None if it is not installed yet."""
     try:
         _secrets_to_env()
+        folder = data_dir()
+        if folder is not None:  # the parser reads names from the same files the app loaded
+            os.environ["NBALAB_PARSER_DATA_DIR"] = str(folder)
         return importlib.import_module("nbalab.nlp.parser")
     except Exception:
         return None

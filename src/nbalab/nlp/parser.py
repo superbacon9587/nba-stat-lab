@@ -54,6 +54,8 @@ __all__ = [
 class ParserConfig:
     """Everything tunable about parsing. Environment overrides (read by
     :meth:`from_env`): ``NBALAB_PARSER_MODEL``, ``NBALAB_PARSER_EFFORT``,
+    ``NBALAB_PARSER_DATA_DIR`` (folder with players/teams/player_games parquet; the
+    hosted app sets it to wherever it downloaded the data),
     ``NBALAB_HEIGHT_TOLERANCE`` (inches either side of a single height). Each is
     looked up in Streamlit secrets, then the environment, then ``.env``."""
 
@@ -66,9 +68,12 @@ class ParserConfig:
         llm = LLMSettings()
         llm = replace(llm, model=get_secret("NBALAB_PARSER_MODEL", llm.model) or llm.model,
                       effort=get_secret("NBALAB_PARSER_EFFORT", llm.effort) or llm.effort)
+        data_dir = get_secret("NBALAB_PARSER_DATA_DIR")  # hosted app: where the data was downloaded
         build = BuildSettings()
         if tol := get_secret("NBALAB_HEIGHT_TOLERANCE"):
             build = replace(build, height_tolerance_in=float(tol))
+        if data_dir:
+            return cls(llm=llm, build=build, processed_dir=Path(data_dir))
         return cls(llm=llm, build=build)
 
 
